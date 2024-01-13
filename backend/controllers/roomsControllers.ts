@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Room from "../models/room";
+import ErrorHandler from "../utils/errorHandler";
 
 //GET ALL Rooms    =>  /api/rooms
 export const allRooms = async (req:NextRequest) => {
@@ -24,19 +25,31 @@ export const newRoom = async (req:NextRequest) => {
 
 //GET Room Details   =>  /api/rooms/:id
 export const getRoomsDetails = async (req:NextRequest, {params}:{params:{id:string}}) => {
-    const room = await Room.findById(params.id)
-    if(!room){
+    try {
+        throw new ErrorHandler("Helo", 404)
+        const room = await Room.findById(params.id)
+        if(!room){
+            return NextResponse.json({
+                message:"Room Not Found"
+            },
+            {
+                status:404
+            })
+        }
         return NextResponse.json({
-            message:"Room Not Found"
+            success:true,
+            room
+        })
+    } catch (error: any) {
+        console.log(error.statusCode);
+        
+        return NextResponse.json({
+            message:error.message
         },
         {
-            status:404
+            status:500
         })
     }
-    return NextResponse.json({
-        success:true,
-        room
-    })
 }
 
 
