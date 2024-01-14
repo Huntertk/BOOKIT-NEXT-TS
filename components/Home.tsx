@@ -1,6 +1,7 @@
 import RoomItem from "./room/RoomItem"
 
 const Home = () => {
+
   return (
     <div>
       <section id="rooms" className="container mt-5">
