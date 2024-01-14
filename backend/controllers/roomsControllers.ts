@@ -7,8 +7,8 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
 //GET ALL Rooms    =>  /api/rooms
 export const allRooms = catchAsyncErrors(
     async (req:NextRequest) => {
-        const resPerPage:number = 8
-        // const rooms = await Room.find()
+        const resPerPage:number = 4
+
 
         const queryStr:any = {}
 
@@ -16,13 +16,23 @@ export const allRooms = catchAsyncErrors(
         searchParams.forEach((value, key) => {
             queryStr[key]= value
         })
+
+        const roomsCount:number = await Room.countDocuments() 
         
         const apiFilters = new APIFilters(Room, queryStr).search().filter()
+        
+        let rooms:IRoom[] = await apiFilters.query;
 
-        const rooms:IRoom[] = await apiFilters.query
+        const filteredRoomCount:number = rooms.length
+        apiFilters.pagination(resPerPage)
+        rooms = await apiFilters.query.clone()
+
 
         return NextResponse.json({
             success:true,
+            filteredRoomCount,
+            resPerPage,
+            roomsCount,
             rooms
         })
     }
